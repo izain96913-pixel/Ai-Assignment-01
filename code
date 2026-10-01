@@ -1,1 +1,100 @@
 
+import pandas as pd
+import os
+
+DATA_PATH = "/content/WA_Fn-UseC_-Telco-Customer-Churn.csv"
+
+if not os.path.exists(DATA_PATH):
+    print("CSV file not found. Please upload the CSV file first.")
+else:
+    data = pd.read_csv(DATA_PATH)
+    print(f"Dimensions: {data.shape[0]} rows x {data.shape[1]} columns")
+    display(data.head())
+
+DATA_PATH = "WA_Fn-UseC_-Telco-Customer-Churn.csv"
+
+data = pd.read_csv(DATA_PATH)
+
+print(f"Dimensions: {data.shape[0]} rows x {data.shape[1]} columns")
+
+data.head()
+
+cleaned_df = data.copy()
+
+cleaned_df["TotalCharges"] = pd.to_numeric(
+    cleaned_df["TotalCharges"],
+    errors="coerce"
+)
+
+cleaned_df.dropna(subset=["TotalCharges"], inplace=True)
+
+if "customerID" in cleaned_df.columns:
+    cleaned_df.drop(columns=["customerID"], inplace=True)
+
+print(f"Cleaned Dataset Dimensions: {cleaned_df.shape}")
+
+import matplotlib.pyplot as plt
+
+print(cleaned_df["Churn"].value_counts())
+
+cleaned_df["Churn"].value_counts().plot(kind="bar")
+
+plt.title("Overall Customer Churn")
+plt.xlabel("Churn")
+plt.ylabel("Number of Customers")
+plt.show()
+
+import matplotlib.pyplot as plt
+
+contract_churn = pd.crosstab(
+    cleaned_df["Contract"],
+    cleaned_df["Churn"]
+)
+
+contract_churn.plot(kind="bar", figsize=(7, 4))
+
+plt.title("Churn by Contract Type")
+plt.xlabel("Contract Type")
+plt.ylabel("Number of Customers")
+plt.xticks(rotation=15)
+
+plt.show()
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(6, 4))
+
+sns.boxplot(
+    data=cleaned_df,
+    x="Churn",
+    y="tenure"
+)
+
+plt.title("Tenure Distribution across Churn")
+plt.xlabel("Churn")
+plt.ylabel("Tenure (Months)")
+
+plt.show()
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(6, 4))
+
+sns.boxplot(
+    data=cleaned_df,
+    x="Churn",
+    y="MonthlyCharges"
+)
+
+plt.title("Monthly Charges vs Churn Status")
+plt.xlabel("Churn")
+plt.ylabel("Monthly Charges")
+
+plt.show()
+
+churn_pct = cleaned_df["Churn"].value_counts(normalize=True) * 100
+
+print("Churn Percentages:")
+print(churn_pct.round(2).to_string() + "%")
